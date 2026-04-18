@@ -22,8 +22,8 @@ connectDB();
 const app = express();
 
 app.use(cors({
-  origin: process.env.FRONTEND_URL,
-  credentials: true,
+  origin: "https://zevox-tech-store.vercel.app",
+  credentials: true
 }));
 
 app.use(express.json());
