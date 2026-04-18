@@ -33,7 +33,7 @@ export default function Cart() {
   const removeItem = async (productId) => {
     setRemoving(productId);
     try {
-      await api.put("/cart/remove", { data: { userId, productId } });
+      await api.delete("/cart/remove", { data: { userId, productId } });
       setItems(items.filter(i => (i.productId?._id || i.productId) !== productId));
       window.dispatchEvent(new Event("cartUpdated"));
     } catch { fetchCart(); }
