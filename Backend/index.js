@@ -50,11 +50,18 @@ passport.use(new GoogleStrategy({
   callbackURL: process.env.GOOGLE_CALLBACK_URL,
 }, async (accessToken, refreshToken, profile, done) => {
   try {
-    let user = await User.findOne({ email: profile.emails[0].value });
+    const email = profile.emails?.[0]?.value;
+
+    if (!email) {
+      return done(new Error("No email from Google"), null);
+    }
+
+    let user = await User.findOne({ email });
+
     if (!user) {
       user = await User.create({
         name: profile.displayName,
-        email: profile.emails[0].value,
+        email,
         googleId: profile.id,
         password: "GOOGLE_OAUTH_" + Math.random().toString(36).slice(2),
         avatar: profile.photos?.[0]?.value || "",
@@ -63,11 +70,14 @@ passport.use(new GoogleStrategy({
       user.googleId = profile.id;
       await user.save();
     }
+
     return done(null, user);
   } catch (err) {
+    console.error("Google Strategy Error:", err);
     return done(err, null);
   }
-}));
+}
+))
 
 passport.serializeUser((user, done) => done(null, user._id));
 passport.deserializeUser(async (id, done) => {
